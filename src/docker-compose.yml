@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  consul1:
+    image: hashicorp/consul:1.15
+    container_name: consul1
+    command: "agent -server -bootstrap-expect=3 -node=consul1 - bind =0.0.0.0 -client=0.0.0.0"
+
+  toxiproxy1:
+    image: ghcr.io/shopify/toxiproxy:2.5.0
+    container_name: toxyproxy1
+    ports:
+      - "8474:8474"
+    depends_on:
+      - consul1
