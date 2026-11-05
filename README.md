@@ -8,3 +8,5 @@
 **Fault Injection**
 1. Go to ``src`` directory with ``cd src``
 2. In the ``src`` directory, run ``python3 inject.py`` in the terminal
+
+**Information about Shopify/toxyproxy [here](https://github.com/shopify/toxiproxy)
