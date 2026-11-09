@@ -15,4 +15,5 @@
    1. Example: ``requests.post(f"http://localhost:8474/proxies/consul1/toxics", json=payload)``
    2. General usage: ``requests.post(f"http://localhost:8474/proxies/{consul_name}/toxics", json=payload)``
 3. Information about Shopify/toxyproxy [here](https://github.com/shopify/toxiproxy)
-4. Information about Toxiproxy API [here](https://developer.hashicorp.com/consul/api-docs/agent#view-metrics)
+4. Information about Consul API metrics [here](https://developer.hashicorp.com/consul/api-docs/agent#view-metrics)
+5. Information about Consul API structure [here](https://developer.hashicorp.com/consul/api-docs/api-structure) 
