@@ -10,7 +10,7 @@
 2. In the ``src`` directory, run ``python3 inject.py`` in the terminal
 
 **Toxyproxy API**
-1. Access Consul-UI through ``http://10.99.0.20/8500``, use this for getting Consul metrics
+1. Access Consul-UI through ``http://localhost:8500``, use this for getting Consul metrics
 2. Access Consul proxies for injection ``http://localhost:8474``
    1. Example: ``requests.post(f"http://localhost:8474/proxies/consul1/toxics", json=payload)``
    2. General usage: ``requests.post(f"http://localhost:8474/proxies/{consul_name}/toxics", json=payload)``
