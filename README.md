@@ -5,6 +5,11 @@
 2. When you want to reset the state of the docker containers do the following:
    1. Tear Down & Reset State: ``sudo docker compose down -v``
 
+**Dependencies**
+1. Create a virtual environment: ``python3 -m venv .venv``
+2. Install numpy: ``pip install numpy``
+3. Install requests: ``pip install requests``
+
 **Fault Injection**
 1. Go to ``src`` directory with ``cd src``
 2. In the ``src`` directory, run ``python3 inject.py`` in the terminal
