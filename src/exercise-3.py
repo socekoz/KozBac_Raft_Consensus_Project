@@ -5,9 +5,11 @@ import pprint
 import numpy as np
 
 latency_arr = []
+latency_arr_overall = []
 
 def writes():
     global latency_arr
+    global latency_arr_overall
     TOXIPROXY_API = "http://localhost:8500" # metrics
     payload = {
         "my-key": 2,
@@ -20,9 +22,11 @@ def writes():
         after_time = time.time()
         latency = (after_time - before_time)
         latency_arr.append(latency)
+        latency_arr_overall.append(latency)
         i += 1
 
 def five_percent_latency():
+    global latency_arr
     print("==============================5% LATENCY============================")
     TOXIPROXY_API = "http://localhost:8474" # injection
     payload = {
@@ -36,13 +40,15 @@ def five_percent_latency():
     print(json_data.json())
 
     writes()
-    latency_analysis()
+    latency_analysis(latency_arr)
+    latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
     requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_5")
     #requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency")
 
 def ten_percent_latency():
+    global latency_arr
     print("==============================10% LATENCY============================")
     TOXIPROXY_API = "http://localhost:8474" # injection
     payload = {
@@ -56,12 +62,14 @@ def ten_percent_latency():
     print(json_data.json())
 
     writes()
-    latency_analysis()
+    latency_analysis(latency_arr)
+    latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
     requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_10")
 
 def twenty_five_percent_latency():
+    global latency_arr
     print("==============================25% LATENCY============================")
     TOXIPROXY_API = "http://localhost:8474" # injection
     payload = {
@@ -75,23 +83,26 @@ def twenty_five_percent_latency():
     print(json_data.json())
 
     writes()
-    latency_analysis()
+    latency_analysis(latency_arr)
+    latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
     requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_25")
 
-def latency_analysis():
-    global latency_arr
-    arr = np.array(latency_arr)
+def latency_analysis(array_input):
+    #global latency_arr
+    arr = np.array(array_input)
     results = np.percentile(arr, [50,99])
     print(f"Latency Percentile Results (p50 & p99): {results}")
-    latency_arr.clear()
+    #.clear()
 
 def main():
     #baseline()
+    global latency_arr_overall
     five_percent_latency()
     ten_percent_latency()
     twenty_five_percent_latency()
+    latency_analysis(latency_arr_overall)
 
 main()
 
