@@ -9,6 +9,7 @@
 1. Create a virtual environment: ``python3 -m venv .venv``
 2. Install numpy: ``pip install numpy``
 3. Install requests: ``pip install requests``
+4. Install matplotlib: ``pip install matplotlib``
 
 **Fault Injection**
 1. Go to ``src`` directory with ``cd src``

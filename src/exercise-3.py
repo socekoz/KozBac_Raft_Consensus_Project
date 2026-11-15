@@ -3,6 +3,8 @@ import time
 import json
 import pprint
 import numpy as np
+from matplotlib import mlab
+import matplotlib.pyplot as plt
 
 latency_arr = []
 latency_arr_overall = []
@@ -25,14 +27,58 @@ def writes():
         latency_arr_overall.append(latency)
         i += 1
 
-def five_percent_latency():
+def all_latency():
     global latency_arr
+    global latency_arr_overall
     print("==============================5% LATENCY============================")
     TOXIPROXY_API = "http://localhost:8474" # injection
     payload = {
         "name": "latency_5",
         "type": "latency",
-        "attributes": {"latency": 5000, "jitter": 0} # 5% latency
+        "attributes": {"latency": 50, "jitter": 0} # 5% latency
+    }
+    # INJECT TOXIC
+    requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
+
+    payload = {
+            "name": "latency_10",
+            "type": "latency",
+            "attributes": {"latency": 100, "jitter": 0} # 10% latency
+        }
+    # INJECT TOXIC
+    requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
+
+    payload = {
+            "name": "latency_25",
+            "type": "latency",
+            "attributes": {"latency": 250, "jitter": 0} # 25% latency
+        }
+    # INJECT TOXIC
+    requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
+
+    json_data = requests.get(f"{TOXIPROXY_API}/proxies/consul1/toxics")
+    print(json_data.json())
+
+    writes()
+    latency_analysis(latency_arr)
+    plot_percentiles(1, "exercise3_files/exercise3-all")
+    latency_arr.clear()
+    latency_arr_overall.clear()
+
+    # HEAL NETWORK CONNECTION
+    requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_5")
+    requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_10")
+    requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_25")
+    #requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency")
+
+def five_percent_latency():
+    global latency_arr
+    print("==============================10% LATENCY============================")
+    TOXIPROXY_API = "http://localhost:8474" # injection
+    payload = {
+        "name": "latency_5",
+        "type": "latency",
+        "attributes": {"latency": 50, "jitter": 0} # 5% latency
     }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -41,11 +87,11 @@ def five_percent_latency():
 
     writes()
     latency_analysis(latency_arr)
+    plot_percentiles(2, "exercise3_files/exercise3-5")
     latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
     requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_5")
-    #requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency")
 
 def ten_percent_latency():
     global latency_arr
@@ -54,7 +100,7 @@ def ten_percent_latency():
     payload = {
         "name": "latency_10",
         "type": "latency",
-        "attributes": {"latency": 10000, "jitter": 0} # 5% latency
+        "attributes": {"latency": 100, "jitter": 0} # 5% latency
     }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -63,6 +109,7 @@ def ten_percent_latency():
 
     writes()
     latency_analysis(latency_arr)
+    plot_percentiles(3, "exercise3_files/exercise3-10")
     latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
@@ -75,7 +122,7 @@ def twenty_five_percent_latency():
     payload = {
         "name": "latency_25",
         "type": "latency",
-        "attributes": {"latency": 25000, "jitter": 0} # 5% latency
+        "attributes": {"latency": 250, "jitter": 0} # 5% latency
     }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -84,6 +131,7 @@ def twenty_five_percent_latency():
 
     writes()
     latency_analysis(latency_arr)
+    plot_percentiles(4, "exercise3_files/exercise3-25")
     latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
@@ -96,13 +144,34 @@ def latency_analysis(array_input):
     print(f"Latency Percentile Results (p50 & p99): {results}")
     #.clear()
 
+def plot_percentiles(figure_num, file_name):
+    global latency_arr
+
+    arr = np.array(latency_arr)
+    arr.sort()
+    p = np.array([0.0, 50.0, 99.0])
+
+    perc = np.percentile(arr, p)
+
+    plt.figure(figure_num)
+    plt.plot(arr)
+    plt.plot((len(arr)-1)*p/100., perc, 'ro')
+    plt.xticks((len(arr)-1)*p/100., map(str, p))
+
+    plt.savefig(file_name)
+
+
+
 def main():
     #baseline()
-    global latency_arr_overall
+    global latency_arr
+    all_latency()
     five_percent_latency()
     ten_percent_latency()
     twenty_five_percent_latency()
-    latency_analysis(latency_arr_overall)
+    #latency_analysis(latency_arr_overall)
+    #plot_percentiles()
+    #latency_arr.clear()
 
 main()
 
