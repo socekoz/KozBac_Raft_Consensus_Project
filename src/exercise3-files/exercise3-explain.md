@@ -1,7 +1,7 @@
 Deliverable: Plot p50 and p99 client-observed write latencies as a function of packet loss rate. Explain why p99 degrades faster than p50. 
 
 **Plots for p50 and p99**
-1. See ``.png`` files under ``exercise3_files`` directory for percentiles corresponding to each percentage of packet loss rates
+1. See ``.png`` files under ``exercise3-files`` directory for percentiles corresponding to each percentage of packet loss rates
 - ``exercise3-5.png`` - 5% latency test
 - ``exercise3-10.png`` -  10% latency test
 - ``exercise3-25.png`` - 25% latency test
