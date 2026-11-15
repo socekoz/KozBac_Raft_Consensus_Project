@@ -1,3 +1,6 @@
+**Deliverables**
+1. Exercise 3 - See [exercise3-explain.md](src/exercise3_files/exercise3-explain.md)
+
 **Environment Lifecycle Commands**
 1. Before you begin make sure the docker containers are up and running:
    1. Start Cluster: ``sudo docker compose up -d`` (first time running this command may take some time)
