@@ -12,20 +12,16 @@ Deliverable: Plot p50 and p99 client-observed write latencies as a function of p
 ![percentile plots](exercise3-plot.pdf)
 
 **Explain why p99 degrades faster than p50**
-Before we can understand why p99 degrades faster than p50, we must first understand what those percentiles represent with respect
-to the percentiles that they are associated with. In words, p50 shows that 50% of all key-value write requests for 5%, 10%, and 25% packet loss rates have 
-latencies at or under a value n (in milliseconds), while p99shows that 99% of all key-value write requests have 
-latencies at or under another value m (in milliseconds). 
+Before we can understand why p99 degrades faster than p50, we must first understand what those percentiles 
+represent with respect to the packet loss rates that they are associated with. In words, p50 shows that 50% 
+of all key-value write requests for 5%, 10%, and 25% packet loss rates have latencies at or under a value 
+n (in milliseconds), while p99 shows that 99% of all key-value write requests for 5%, 10%, and 25% packet 
+loss rates have latencies at or under another value m (in milliseconds). 
 
-With that being said, assuming "degradation" in this case refers to the decrease in latency associated with p99 
-when compared to p50 across all packet loss rates, p99 degrades faster than p50 because p99 effectively represents 
-the maximum value that a latency can be for a given packet loss rate. So, for a packet loss rate of 5% the maximum value in 
-milliseconds (ms) that 99% of latencies could be is 0.7 ms, while for a packet loss rate of 10% the maximum value in 
-milliseconds (ms) that 99% of latencies could be is 0.2 ms, and for a packet loss rate of 25% the maximum value in 
-milliseconds (ms) that 99% of latencies could be is 0.15 ms. Now, considering latencies for p99 for packet loss rates of 
-5%, 10%, and 25%, respectively, it demonstrates that, overall, the highest latency that a given packet loss rate can get 
-decreases/degrades as packet loss rates get higher, possibly due to (1) most packets responding quickly despite the latency 
-toxics injected, causing the low latency recordings for both 10% and 25% packet loss compared to the higher latency 
-recordings for 5% packet loss, or (2) there is less variability in latency for both 10% and 25% packet loss rates, as 
-a larger margin exists between their respective p50 and p99 recordings, compared to the variability in latency for 
-5% packet loss rate, where a smaller margin exists between its p50 and p99 recordings.
+Based on the plotted points on the graph provided, there is a trend, from 5% packet loss to 10% packet loss, 
+showing how p99 appears to degrade, or decrease, in latency when higher rates of packet loss are injected 
+into the network. The reason for this increased degradation could be due to the packet loss rates injected.
+As packet loss rates go up, it is expected to see a positively correlated change in the latency of key-value write 
+requests as a result. With that, more and more requests are experiencing greater latencies, meaning that p99 would
+have to become smaller in order to accommodate for this change, as a higher percentile (i.e. p100) would capture
+higher latencies (capturing the smaller portion of requests that have very high latencies). 
