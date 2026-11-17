@@ -61,7 +61,7 @@ def all_latency():
 
     writes()
     latency_analysis(latency_arr)
-    plot_percentiles(1, "exercise3_files/exercise3-all")
+    plot_percentiles(1, "exercise3-files/exercise3-all")
     latency_arr.clear()
     latency_arr_overall.clear()
 
@@ -87,7 +87,7 @@ def five_percent_latency():
 
     writes()
     latency_analysis(latency_arr)
-    plot_percentiles(2, "exercise3_files/exercise3-5")
+    plot_percentiles(2, "exercise3-files/exercise3-5")
     latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
@@ -109,7 +109,7 @@ def ten_percent_latency():
 
     writes()
     latency_analysis(latency_arr)
-    plot_percentiles(3, "exercise3_files/exercise3-10")
+    plot_percentiles(3, "exercise3-files/exercise3-10")
     latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
@@ -131,7 +131,7 @@ def twenty_five_percent_latency():
 
     writes()
     latency_analysis(latency_arr)
-    plot_percentiles(4, "exercise3_files/exercise3-25")
+    plot_percentiles(4, "exercise3-files/exercise3-25")
     latency_arr.clear()
 
     # HEAL NETWORK CONNECTION
@@ -159,8 +159,6 @@ def plot_percentiles(figure_num, file_name):
     plt.xticks((len(arr)-1)*p/100., map(str, p))
 
     plt.savefig(file_name)
-
-
 
 def main():
     #baseline()
