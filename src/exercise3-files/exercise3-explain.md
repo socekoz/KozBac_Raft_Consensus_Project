@@ -12,9 +12,10 @@ Deliverable: Plot p50 and p99 client-observed write latencies as a function of p
 ![percentile plots](exercise3-plot.pdf)
 
 **Explain why p99 degrades faster than p50**
-Before we can understand why p99 degrades faster than p50, we must first understand what those percentiles represent.
-In words, p50 shows that 50% of all key-value write requests have latencies at or under a value n (in milliseconds), while p99
-shows that 99% of all key-value write requests have latencies at or under another value m (in milliseconds). 
+Before we can understand why p99 degrades faster than p50, we must first understand what those percentiles represent with respect
+to the percentiles that they are associated with. In words, p50 shows that 50% of all key-value write requests for 5%, 10%, and 25% packet loss rates have 
+latencies at or under a value n (in milliseconds), while p99shows that 99% of all key-value write requests have 
+latencies at or under another value m (in milliseconds). 
 
 With that being said, assuming "degradation" in this case refers to the decrease in latency associated with p99 
 when compared to p50 across all packet loss rates, p99 degrades faster than p50 because p99 effectively represents 
