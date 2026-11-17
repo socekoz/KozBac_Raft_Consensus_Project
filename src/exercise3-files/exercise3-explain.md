@@ -9,6 +9,8 @@ Deliverable: Plot p50 and p99 client-observed write latencies as a function of p
 - ``exercise3-25.png`` - 25% latency test
 - ``exercise3-all.png`` - 5%, 10%, 25% latency toxics injected together
 
+![percentile plots](exercise3-plot.pdf)
+
 **Explain why p99 degrades faster than p50**
 Before we can understand why p99 degrades faster than p50, we must first understand what those percentiles represent.
 In words, p50 shows that 50% of all key-value write requests have latencies at or under a value n (in milliseconds), while p99
