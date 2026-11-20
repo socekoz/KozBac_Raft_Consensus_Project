@@ -18,10 +18,11 @@ of all key-value write requests for 5%, 10%, and 25% packet loss rates have late
 n (in milliseconds), while p99 shows that 99% of all key-value write requests for 5%, 10%, and 25% packet 
 loss rates have latencies at or under another value m (in milliseconds). 
 
-Based on the plotted points on the graph provided, there is a trend, from 5% packet loss to 10% packet loss, 
-showing how p99 appears to degrade, or decrease, in latency when higher rates of packet loss are injected 
+Based on the plotted points on the graph provided, there is a trend, from 5% packet loss to 25% packet loss, 
+showing how p99 appears to degrade, or increase, in latency when higher rates of packet loss are injected 
 into the network. The reason for this increased degradation could be due to the packet loss rates injected.
 As packet loss rates go up, it is expected to see a positively correlated change in the latency of key-value write 
-requests as a result. With that, more and more requests are experiencing greater latencies, meaning that p99 would
-have to become smaller in order to accommodate for this change, as a higher percentile (i.e. p100) would capture
-higher latencies (capturing the smaller portion of requests that have very high latencies). 
+requests as a result. With that, more and more requests are experiencing greater latencies, meaning that p99 would 
+increasingly represent/consist of higher latencies, causing its data to be plotted higher in the graph 
+as a result. On the other hand, p50 represents half of all requests and the latencies associated with them and, 
+as such, represents/consists of shorter latencies, causing it to be plotted lower in the graph. 

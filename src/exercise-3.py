@@ -35,7 +35,7 @@ def all_latency():
     payload = {
         "name": "latency_5",
         "type": "latency",
-        "attributes": {"latency": 50, "jitter": 0} # 5% latency
+        "attributes": {"latency": 0, "jitter": 50} # 5% latency
     }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -43,7 +43,7 @@ def all_latency():
     payload = {
             "name": "latency_10",
             "type": "latency",
-            "attributes": {"latency": 100, "jitter": 0} # 10% latency
+            "attributes": {"latency": 0, "jitter": 100} # 10% latency
         }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -51,7 +51,7 @@ def all_latency():
     payload = {
             "name": "latency_25",
             "type": "latency",
-            "attributes": {"latency": 250, "jitter": 0} # 25% latency
+            "attributes": {"latency": 0, "jitter": 250} # 25% latency
         }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -78,7 +78,7 @@ def five_percent_latency():
     payload = {
         "name": "latency_5",
         "type": "latency",
-        "attributes": {"latency": 50, "jitter": 0} # 5% latency
+        "attributes": {"latency": 0, "jitter": 50} # 5% latency
     }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -100,7 +100,7 @@ def ten_percent_latency():
     payload = {
         "name": "latency_10",
         "type": "latency",
-        "attributes": {"latency": 100, "jitter": 0} # 5% latency
+        "attributes": {"latency": 0, "jitter": 100} # 5% latency
     }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
@@ -122,7 +122,7 @@ def twenty_five_percent_latency():
     payload = {
         "name": "latency_25",
         "type": "latency",
-        "attributes": {"latency": 250, "jitter": 0} # 5% latency
+        "attributes": {"latency": 0, "jitter": 250} # 5% latency
     }
     # INJECT TOXIC
     requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
