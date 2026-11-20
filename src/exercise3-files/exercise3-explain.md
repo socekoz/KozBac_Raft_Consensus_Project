@@ -9,7 +9,7 @@ Deliverable: Plot p50 and p99 client-observed write latencies as a function of p
 - ``exercise3-25.png`` - 25% latency test
 - ``exercise3-all.png`` - 5%, 10%, 25% latency toxics injected together
 
-![percentile plots](exercise3-plot.pdf)
+![percentile plot](exercise-3-graph.pdf)
 
 **Explain why p99 degrades faster than p50**
 Before we can understand why p99 degrades faster than p50, we must first understand what those percentiles 
