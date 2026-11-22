@@ -23,28 +23,29 @@ def latency_test(latency):
         payload = {
             "name": f"latency_{i}",
             "type": "latency",
+            "stream": "upstream",
             "attributes": {"latency": i*latency, "jitter": 0} # i.e. increasing latency by 50 ms after each loop
         }
 
         # inject toxics
-        requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
-        requests.post(f"{TOXIPROXY_API}/proxies/consul2/toxics", json=payload)
-        requests.post(f"{TOXIPROXY_API}/proxies/consul3/toxics", json=payload)
+        #requests.post(f"{TOXIPROXY_API}/proxies/consul1/toxics", json=payload)
+        #requests.post(f"http://localhost:8475/proxies/consul2/toxics", json=payload)
+        requests.post(f"http://localhost:8476/proxies/consul3/toxics", json=payload)
         #print(f"Total latency injected: {i*500}. Waiting ...")
 
         # verify toxics were created
-        json_data = requests.get(f"{TOXIPROXY_API}/proxies/consul1/toxics")
-        print(json_data.json())
-        json_data = requests.get(f"{TOXIPROXY_API}/proxies/consul2/toxics")
-        print(json_data.json())
-        json_data = requests.get(f"{TOXIPROXY_API}/proxies/consul3/toxics")
+        #json_data = requests.get(f"{TOXIPROXY_API}/proxies/consul1/toxics")
+        #print(json_data.json())
+        #json_data = requests.get(f"http://localhost:8475/proxies/consul2/toxics")
+        #print(json_data.json())
+        json_data = requests.get(f"http://localhost:8476/proxies/consul3/toxics")
         print(json_data.json())
         time.sleep(20)
 
         # clean up
-        requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_{i}")
-        requests.delete(f"{TOXIPROXY_API}/proxies/consul2/toxics/latency_{i}")
-        requests.delete(f"{TOXIPROXY_API}/proxies/consul3/toxics/latency_{i}")
+        #requests.delete(f"{TOXIPROXY_API}/proxies/consul1/toxics/latency_{i}")
+        #requests.delete(f"http://localhost:8475/proxies/consul2/toxics/latency_{i}")
+        requests.delete(f"http://localhost:8476/proxies/consul3/toxics/latency_{i}")
 
         i += 1
 
@@ -76,7 +77,7 @@ def get_metrics():
 
 def main():
     global latency_arr
-    latency_test(50)
+    latency_test(300)
 
 main()
 
