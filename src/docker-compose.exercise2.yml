@@ -1,0 +1,341 @@
+networks:
+  raft-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.99.0.0/24
+
+services:
+  #Consul nodes
+  #Service names are consul{N}-node so they do NOT collide with
+  #the "consul{N}" network alias on the matching Toxiproxy sidecar.
+  #Each node advertises the Toxiproxy sidecar IP and retry-joins
+  #through the other four sidecar IPs, so ALL peer traffic
+  #(Raft 8300, Serf LAN 8301, Serf WAN 8302) flows through the proxy.
+  #This is needed because docker compose uses the container name or service name
+  #for DNS resolution, so if the Consul node advertised its own IP,
+  #the other nodes would bypass the proxy and connect directly to it.
+  #Consul UI client — NOT a Raft voter; only provides the web UI and API gateway
+  consul-ui:
+    image: hashicorp/consul:1.15
+    container_name: consul-ui
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.20
+    ports:
+      - "8500:8500"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    command:
+      - "agent"
+      - "-node=consul-ui"
+      - "-bind=0.0.0.0"
+      - "-client=0.0.0.0"
+      - "-ui"
+      - "-datacenter=dc1"
+      - "-data-dir=/tmp/consul"
+      - "-retry-join=10.99.0.2"
+      - "-retry-join=10.99.0.3"
+      - "-retry-join=10.99.0.4"
+      - "-retry-join=10.99.0.5"
+      - "-retry-join=10.99.0.6"
+    depends_on:
+      - consul1-node
+      - consul2-node
+      - consul3-node
+      - consul4-node
+      - consul5-node
+
+  consul1-node:
+    image: hashicorp/consul:1.15
+    container_name: consul1-node
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.2
+    ports:
+      - "8511:8500"
+    command:
+      - "agent"
+      - "-server"
+      - "-bootstrap-expect=5"
+      - "-node=consul1"
+      - "-bind=0.0.0.0"
+      - "-client=0.0.0.0"
+      - "-advertise=10.99.0.2"
+      - "-datacenter=dc1"
+      - "-data-dir=/tmp/consul"
+      - "-retry-join=10.99.0.3"
+      - "-retry-join=10.99.0.4"
+      - "-retry-join=10.99.0.5"
+      - "-retry-join=10.99.0.6"
+
+  consul2-node:
+    image: hashicorp/consul:1.15
+    container_name: consul2-node
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.3
+    ports:
+      - "8512:8500"
+    command:
+      - "agent"
+      - "-server"
+      - "-bootstrap-expect=5"
+      - "-node=consul2"
+      - "-bind=0.0.0.0"
+      - "-client=0.0.0.0"
+      - "-advertise=10.99.0.3"
+      - "-datacenter=dc1"
+      - "-data-dir=/tmp/consul"
+      - "-retry-join=10.99.0.2"
+      - "-retry-join=10.99.0.4"
+      - "-retry-join=10.99.0.5"
+      - "-retry-join=10.99.0.6"
+
+  consul3-node:
+    image: hashicorp/consul:1.15
+    container_name: consul3-node
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.4
+    ports:
+      - "8513:8500"
+    command:
+      - "agent"
+      - "-server"
+      - "-bootstrap-expect=5"
+      - "-node=consul3"
+      - "-bind=0.0.0.0"
+      - "-client=0.0.0.0"
+      - "-advertise=10.99.0.4"
+      - "-datacenter=dc1"
+      - "-data-dir=/tmp/consul"
+      - "-retry-join=10.99.0.2"
+      - "-retry-join=10.99.0.3"
+      - "-retry-join=10.99.0.5"
+      - "-retry-join=10.99.0.6"
+
+  consul4-node:
+    image: hashicorp/consul:1.15
+    container_name: consul4-node
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.5
+    ports:
+      - "8514:8500"
+    command:
+      - "agent"
+      - "-server"
+      - "-bootstrap-expect=5"
+      - "-node=consul4"
+      - "-bind=0.0.0.0"
+      - "-client=0.0.0.0"
+      - "-advertise=10.99.0.5"
+      - "-datacenter=dc1"
+      - "-data-dir=/tmp/consul"
+      - "-retry-join=10.99.0.2"
+      - "-retry-join=10.99.0.3"
+      - "-retry-join=10.99.0.4"
+      - "-retry-join=10.99.0.6"
+
+  consul5-node:
+    image: hashicorp/consul:1.15
+    container_name: consul5-node
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.6
+    ports:
+      - "8515:8500"
+    command:
+      - "agent"
+      - "-server"
+      - "-bootstrap-expect=5"
+      - "-node=consul5"
+      - "-bind=0.0.0.0"
+      - "-client=0.0.0.0"
+      - "-advertise=10.99.0.6"
+      - "-datacenter=dc1"
+      - "-data-dir=/tmp/consul"
+      - "-retry-join=10.99.0.2"
+      - "-retry-join=10.99.0.3"
+      - "-retry-join=10.99.0.4"
+      - "-retry-join=10.99.0.5"
+
+#Toxiproxy sidecars (dedicated container running beside each Consul node)
+#Each sidecar gets a network alias matching the Consul node name
+#(consul1, consul2, consul3, consul4, consul5) so that DNS resolution within the
+#Docker network routes to the proxy, not the real Consul container.
+#Proxy configs are defined as Compose configs (below) and mounted
+#directly into each container — no external files needed.
+
+  toxiproxy1:
+    image: ghcr.io/shopify/toxiproxy:2.5.0
+    container_name: toxiproxy1
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.10
+        aliases:
+          - consul1
+    ports:
+      - "8474:8474"
+    configs:
+      - source: toxiproxy1_config
+        target: /config/toxiproxy.json
+    command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
+    depends_on:
+      - consul1-node
+
+  toxiproxy2:
+    image: ghcr.io/shopify/toxiproxy:2.5.0
+    container_name: toxiproxy2
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.11
+        aliases:
+          - consul2
+    ports:
+      - "8475:8474"
+    configs:
+      - source: toxiproxy2_config
+        target: /config/toxiproxy.json
+    command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
+    depends_on:
+      - consul2-node
+
+  toxiproxy3:
+    image: ghcr.io/shopify/toxiproxy:2.5.0
+    container_name: toxiproxy3
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.12
+        aliases:
+          - consul3
+    ports:
+      - "8476:8474"
+    configs:
+      - source: toxiproxy3_config
+        target: /config/toxiproxy.json
+    command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
+    depends_on:
+      - consul3-node
+
+  toxiproxy4:
+    image: ghcr.io/shopify/toxiproxy:2.5.0
+    container_name: toxiproxy4
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.13
+        aliases:
+          - consul4
+    ports:
+      - "8477:8474"
+    configs:
+      - source: toxiproxy4_config
+        target: /config/toxiproxy.json
+    command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
+    depends_on:
+      - consul4-node
+
+  toxiproxy5:
+    image: ghcr.io/shopify/toxiproxy:2.5.0
+    container_name: toxiproxy5
+    networks:
+      raft-net:
+        ipv4_address: 10.99.0.14
+        aliases:
+          - consul5
+    ports:
+      - "8478:8474"
+    configs:
+      - source: toxiproxy5_config
+        target: /config/toxiproxy.json
+    command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
+    depends_on:
+      - consul5-node
+
+  toxiproxy-netadmin1:
+    image: alpine:3.19
+    container_name: toxiproxy-netadmin1
+    network_mode: "service:consul1-node"
+    cap_add:
+      - NET_ADMIN
+    command: [ "sh", "-c", "apk add --no-cache iptables && sleep infinity" ]
+    depends_on:
+      - consul1-node
+
+  toxiproxy-netadmin2:
+    image: alpine:3.19
+    container_name: toxiproxy-netadmin2
+    network_mode: "service:consul2-node"
+    cap_add:
+      - NET_ADMIN
+    command: [ "sh", "-c", "apk add --no-cache iptables && sleep infinity" ]
+    depends_on:
+      - consul2-node
+
+  toxiproxy-netadmin3:
+    image: alpine:3.19
+    container_name: toxiproxy-netadmin3
+    network_mode: "service:consul3-node"
+    cap_add:
+      - NET_ADMIN
+    command: [ "sh", "-c", "apk add --no-cache iptables && sleep infinity" ]
+    depends_on:
+      - consul3-node
+
+  toxiproxy-netadmin4:
+    image: alpine:3.19
+    container_name: toxiproxy-netadmin4
+    network_mode: "service:consul4-node"
+    cap_add:
+      - NET_ADMIN
+    command: [ "sh", "-c", "apk add --no-cache iptables && sleep infinity" ]
+    depends_on:
+      - consul4-node
+
+  toxiproxy-netadmin5:
+    image: alpine:3.19
+    container_name: toxiproxy-netadmin5
+    network_mode: "service:consul5-node"
+    cap_add:
+      - NET_ADMIN
+    command: [ "sh", "-c", "apk add --no-cache iptables && sleep infinity" ]
+    depends_on:
+      - consul5-node
+
+configs:
+  toxiproxy1_config:
+    content: |
+      [
+        {"name":"consul1", "listen":"0.0.0.0:8300","upstream":"consul1-node:8300"},
+        {"name":"consul1-serf", "listen":"0.0.0.0:8301","upstream":"consul1-node:8301"},
+        {"name":"consul1-wan", "listen":"0.0.0.0:8302","upstream":"consul1-node:8302"}
+      ]
+  toxiproxy2_config:
+    content: |
+      [
+        {"name":"consul2", "listen":"0.0.0.0:8300","upstream":"consul2-node:8300"},
+        {"name":"consul2-serf", "listen":"0.0.0.0:8301","upstream":"consul2-node:8301"},
+        {"name":"consul2-wan", "listen":"0.0.0.0:8302","upstream":"consul2-node:8302"}
+      ]
+  toxiproxy3_config:
+    content: |
+      [
+        {"name":"consul3", "listen":"0.0.0.0:8300","upstream":"consul3-node:8300"},
+        {"name":"consul3-serf", "listen":"0.0.0.0:8301","upstream":"consul3-node:8301"},
+        {"name":"consul3-wan", "listen":"0.0.0.0:8302","upstream":"consul3-node:8302"}
+      ]
+  toxiproxy4_config:
+    content: |
+      [
+        {"name":"consul4", "listen":"0.0.0.0:8300","upstream":"consul4-node:8300"},
+        {"name":"consul4-serf", "listen":"0.0.0.0:8301","upstream":"consul4-node:8301"},
+        {"name":"consul4-wan", "listen":"0.0.0.0:8302","upstream":"consul4-node:8302"}
+      ]
+  toxiproxy5_config:
+    content: |
+      [
+        {"name":"consul5", "listen":"0.0.0.0:8300","upstream":"consul5-node:8300"},
+        {"name":"consul5-serf", "listen":"0.0.0.0:8301","upstream":"consul5-node:8301"},
+        {"name":"consul5-wan", "listen":"0.0.0.0:8302","upstream":"consul5-node:8302"}
+      ]
